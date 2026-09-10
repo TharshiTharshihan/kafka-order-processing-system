@@ -22,15 +22,20 @@ const connectProducer = async () => {
   }
 };
 
-const publishOrder = async (order) => {
-  await connectProducer();
-
-  // Validate order against Avro schema
-  const orderBuffer = OrderType.toBuffer({
+// Convert order object into Avro Buffer
+const serializeOrder = (order) => {
+  return OrderType.toBuffer({
     orderId: String(order.orderId),
     product: String(order.product),
     price: Number(order.price),
   });
+};
+
+// Publish a normal order to orders topic
+const publishOrder = async (order) => {
+  await connectProducer();
+
+  const orderBuffer = serializeOrder(order);
 
   await producer.send({
     topic: "orders",
@@ -38,6 +43,9 @@ const publishOrder = async (order) => {
       {
         key: String(order.orderId),
         value: orderBuffer,
+        headers: {
+          "retry-attempt": Buffer.from("0"),
+        },
       },
     ],
   });
@@ -50,7 +58,60 @@ const publishOrder = async (order) => {
   };
 };
 
+// Publish failed order to retry topic
+const publishRetryOrder = async (order, attempt) => {
+  await connectProducer();
+
+  const orderBuffer = serializeOrder(order);
+
+  await producer.send({
+    topic: "orders.retry",
+    messages: [
+      {
+        key: String(order.orderId),
+        value: orderBuffer,
+        headers: {
+          "retry-attempt": Buffer.from(String(attempt)),
+        },
+      },
+    ],
+  });
+
+  console.log(
+    `Order ${order.orderId} sent to retry topic (attempt ${attempt})`
+  );
+};
+
+// Publish permanently failed order to DLQ
+const publishDLQOrder = async (order, attempt, errorMessage) => {
+  await connectProducer();
+
+  const orderBuffer = serializeOrder(order);
+
+  await producer.send({
+    topic: "orders.DLQ",
+    messages: [
+      {
+        key: String(order.orderId),
+        value: orderBuffer,
+        headers: {
+          "retry-attempt": Buffer.from(String(attempt)),
+          "error": Buffer.from(String(errorMessage)),
+        },
+      },
+    ],
+  });
+
+  console.log(
+    `Order ${order.orderId} sent to DLQ after ${attempt} attempts`
+  );
+};
+
 module.exports = {
   connectProducer,
   publishOrder,
+  publishRetryOrder,
+  publishDLQOrder,
+  serializeOrder,
+  OrderType,
 };

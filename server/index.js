@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const connectDB = require("./config/db");
 const orderRoutes = require("./routes/orderRoute");
-const { connectConsumer } = require("./consumer/orderConsumer");
+const { connectConsumer ,connectRetryConsumer,} = require("./consumer/orderConsumer");
 
 const app = express();
 
@@ -15,6 +15,7 @@ app.use(express.json());
 // Database
 connectDB();
 connectConsumer();
+connectRetryConsumer();
 // Routes
 app.use("/api/orders", orderRoutes);
 

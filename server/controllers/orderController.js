@@ -22,6 +22,42 @@ const getOrders = async (req, res) => {
   }
 };
 
+const getStats = async (req, res) => {
+  try {
+    const Aggregation = require("../models/Aggregation");
+
+    const aggregation = await Aggregation.findOne();
+
+    if (!aggregation) {
+      return res.status(200).json({
+        success: true,
+        stats: {
+          totalOrders: 0,
+          totalPrice: 0,
+          averagePrice: 0,
+        },
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalOrders: aggregation.totalOrders,
+        totalPrice: aggregation.totalPrice,
+        averagePrice: aggregation.averagePrice,
+      },
+    });
+  } catch (error) {
+    console.error("Get stats error:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to get statistics",
+      error: error.message,
+    });
+  }
+};
+
 // Create / publish order
 const createOrder = async (req, res) => {
   try {
@@ -70,4 +106,5 @@ const createOrder = async (req, res) => {
 module.exports = {
   getOrders,
   createOrder,
+  getStats
 };

@@ -7,7 +7,12 @@ const kafka = new Kafka({
 
 const producer = kafka.producer();
 
+const retryConsumer = kafka.consumer({
+  groupId: "order-retry-consumer-group",
+});
+
 module.exports = {
   kafka,
   producer,
+  retryConsumer,
 };
