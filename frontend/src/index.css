@@ -1,0 +1,7 @@
+@import "tailwindcss";
+.highlight {
+  background-color: rgba(251, 146, 60, 0.2);
+  background-repeat: no-repeat;
+  background-size: 100% 45%;
+  background-position: 0 80%;
+}
