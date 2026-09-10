@@ -1,195 +1,105 @@
-import { useState } from "react";
-import {
-  LayoutDashboard,
-  PlusCircle,
-  Ticket,
-  User,
-  LogOut,
-  Menu,
-  X,
-} from "lucide-react";
+import { ShoppingBag, CheckCircle2 } from "lucide-react";
 
-import { Link, useNavigate } from "react-router-dom";
-import { logoutUser } from "../api/authApi";
-import { getUser } from "../utils/auth";
-
-const Sidebar = () => {
-  const user = getUser();
-
-  const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const logout = async () => {
-    try {
-      await logoutUser();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      setIsOpen(false);
-      navigate("/login");
-    }
-  };
-
-  const closeSidebar = () => setIsOpen(false);
+const OrderList = () => {
+  const orders = [
+    {
+      orderId: "1001",
+      product: "Laptop",
+      price: 150000,
+      status: "Processed",
+    },
+    {
+      orderId: "1002",
+      product: "Wireless Mouse",
+      price: 4500,
+      status: "Processed",
+    },
+    {
+      orderId: "1003",
+      product: "Mechanical Keyboard",
+      price: 18500,
+      status: "Processed",
+    },
+    {
+      orderId: "1004",
+      product: "Monitor",
+      price: 75000,
+      status: "Processed",
+    },
+  ];
 
   return (
-    <>
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="sm:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg shadow-md"
-      >
-        <Menu size={24} />
-      </button>
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-      {/* Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40 sm:hidden"
-          onClick={closeSidebar}
-        />
-      )}
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-slate-100 p-6">
+        <div>
+          <h2 className="font-semibold text-slate-900">
+            Recent Orders
+          </h2>
 
-      {/* Sidebar */}
-      <div
-        className={`
-          fixed sm:static top-0 left-0 h-screen rounded-3xl p-2
-          w-64 bg-white shadow-lg z-50
-          transform transition-transform duration-300
-          ${isOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"}
-          flex flex-col
-        `}
-      >
-        {/* Header */}
-        <div className="p-6 border-b flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-orange-500">TicketHub</h1>
-
-          <button onClick={closeSidebar} className="sm:hidden">
-            <X size={24} />
-          </button>
+          <p className="mt-1 text-xs text-slate-500">
+            Orders consumed from Kafka
+          </p>
         </div>
 
-        {/* Navigation */}
+        <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" />
 
-        {user?.role === "admin" ? (
-          <nav className="flex-1 p-4 space-y-3">
-            <Link
-              to="/dashboard"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <LayoutDashboard />
-              Dashboard
-            </Link>
-
-            <Link
-              to="/all-tickets"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <PlusCircle />
-              All Tickets
-            </Link>
-            <Link
-              to="/all-users"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <PlusCircle />
-              All Users
-            </Link>
-
-            <Link
-              to="/profile"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <User />
-              Profile
-            </Link>
-          </nav>
-        ) : user?.role === "user" ? (
-          <nav className="flex-1 p-4 space-y-3">
-            <Link
-              to="/dashboard"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <LayoutDashboard />
-              Dashboard
-            </Link>
-
-            <Link
-              to="/create-ticket"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <PlusCircle />
-              Create Ticket
-            </Link>
-
-            <Link
-              to="/my-tickets"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <Ticket />
-              My Tickets
-            </Link>
-
-            <Link
-              to="/profile"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <User />
-              Profile
-            </Link>
-          </nav>
-        ) : (
-          <nav className="flex-1 p-4 space-y-3">
-            <Link
-              to="/dashboard"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <LayoutDashboard />
-              Dashboard
-            </Link>
-
-            <Link
-              to="/assigned-tickets"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <Ticket />
-              Assigned Tickets
-            </Link>
-
-            <Link
-              to="/profile"
-              onClick={closeSidebar}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-100"
-            >
-              <User />
-              Profile
-            </Link>
-          </nav>
-        )}
-
-        {/* Logout */}
-        <button
-          onClick={logout}
-          className="m-4 bg-orange-500 text-white p-3 rounded-xl flex items-center justify-center gap-2"
-        >
-          <LogOut />
-          Logout
-        </button>
+          <span className="text-xs font-medium text-emerald-600">
+            Live
+          </span>
+        </div>
       </div>
-    </>
+
+      {/* Orders */}
+      <div className="divide-y divide-slate-100">
+        {orders.map((order) => (
+          <div
+            key={order.orderId}
+            className="flex items-center justify-between gap-4 p-5 transition hover:bg-slate-50"
+          >
+
+            <div className="flex min-w-0 items-center gap-4">
+
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                <ShoppingBag size={18} />
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-slate-900">
+                    {order.product}
+                  </p>
+
+                  <span className="text-xs text-slate-400">
+                    #{order.orderId}
+                  </span>
+                </div>
+
+                <p className="mt-1 text-xs text-slate-500">
+                  Order processed successfully
+                </p>
+              </div>
+
+            </div>
+
+            <div className="text-right">
+              <p className="text-sm font-bold text-slate-900">
+                Rs. {order.price.toLocaleString()}
+              </p>
+
+              <div className="mt-1 flex items-center justify-end gap-1 text-xs text-emerald-600">
+                <CheckCircle2 size={13} />
+                {order.status}
+              </div>
+            </div>
+
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
-export default Sidebar;
+export default OrderList;
